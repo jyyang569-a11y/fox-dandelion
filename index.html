@@ -266,6 +266,8 @@ h3{font-size:15px;font-weight:700;margin:0 0 6px}
 .foxWrap.intro .bubble{opacity:1}
 .hero .foxWrap img{width:100px}
 .forest .fox img{width:55px}
+
+@keyframes glowPulse{0%,100%{filter:drop-shadow(0 0 3px currentColor)}50%{filter:drop-shadow(0 0 12px currentColor)}}
 </style>
 </head>
 <body>
@@ -383,13 +385,14 @@ function foxImg(){
  if(h<11)return FOX1_IMG;
  return FOX3_IMG;
 }
-function dandSVG(w){
+function dandSVG(w,color){
+ color=color||"#fff";
  let rays="";
  for(let i=0;i<26;i++){
   const a=i/26*Math.PI*2;
-  rays+=`<line x1="${(Math.cos(a)*3).toFixed(2)}" y1="${(Math.sin(a)*3).toFixed(2)}" x2="${(Math.cos(a)*13).toFixed(2)}" y2="${(Math.sin(a)*13).toFixed(2)}" stroke="#fff" stroke-width="1.4" stroke-linecap="round" opacity=".95"/>`;
+  rays+=`<line x1="${(Math.cos(a)*3).toFixed(2)}" y1="${(Math.sin(a)*3).toFixed(2)}" x2="${(Math.cos(a)*13).toFixed(2)}" y2="${(Math.sin(a)*13).toFixed(2)}" stroke="${color}" stroke-width="1.4" stroke-linecap="round" opacity=".95"/>`;
  }
- return `<svg viewBox="0 0 32 32" width="${w}" height="${w}" xmlns="http://www.w3.org/2000/svg" style="display:block;filter:drop-shadow(0 1px 2px rgba(94,84,79,.18))"><g transform="translate(16 16)">${rays}<circle r="5" fill="#fff" opacity=".95"/></g></svg>`;
+ return `<svg viewBox="0 0 32 32" width="${w}" height="${w}" xmlns="http://www.w3.org/2000/svg" style="display:block"><g transform="translate(16 16)">${rays}<circle r="5" fill="${color}" opacity=".95"/></g></svg>`;
 }
 function tailSVG(){
  return `<svg viewBox="0 0 84 66" width="48" height="38" xmlns="http://www.w3.org/2000/svg" style="display:block">
@@ -467,7 +470,6 @@ function home(){
     <div class="foxTail">${tailSVG()}</div>
     <div class="bubble">我是闹闹~</div>
   </div>
-  <div class="growth"><b>${dandelionCount()}</b><span>蒲公英 · 朵</span></div>
  </div>
  <div class="sectionTitle"><h2>今日任务</h2></div>
  <div class="card">${state.tasks.map((t,i)=>`<div class="task ${t.done?"done":""}" onclick="toggleTask(${i})"><div class="check">${t.done?"✓":""}</div><div class="taskText"><b>${t.icon} ${t.label}</b></div><div class="progress">${t.done?"已收下":"点一下"}</div></div>`).join("")}</div>
