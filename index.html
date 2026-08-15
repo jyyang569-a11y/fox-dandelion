@@ -227,7 +227,7 @@ h3{font-size:15px;font-weight:700;margin:0 0 6px}
 </div>
 
 <script>
-const LS="fox_dandelion_v2";
+const LS="fox_dandelion_v3";
 const now=()=>new Date();
 const pad=n=>String(n).padStart(2,"0");
 const fmtDate=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
@@ -237,7 +237,7 @@ const yesterday=()=>{const d=new Date();d.setDate(d.getDate()-1);return fmtDate(
 const seed=()=>({
  tab:"home",
  lastActive:fmtDate(new Date()),
- streak:17,
+ streak:0,
  tasks:[
   {id:"seed",icon:"🌱",label:"一颗新的蒲公英",desc:"记录今天突然想到的一件事",done:false},
   {id:"read",icon:"📖",label:"读一页书",desc:"今天阅读了什么",done:false},
@@ -245,25 +245,16 @@ const seed=()=>({
   {id:"focus",icon:"⏳",label:"专注学习 45 分钟",desc:"让今天长出一点东西",done:false},
   {id:"night",icon:"🌙",label:"夜晚的话",desc:"今天有什么值得记下来",done:false}
  ],
- notes:[
-  {type:"想法",text:"人真正害怕的也许不是失去时间，而是发现时间过去以后，自己没有留下任何东西。",date:"今天 18:20",ts:Date.now()-1000*60*60*8},
-  {type:"知识",text:"把一个知识点讲给别人听，往往比重复阅读更容易发现自己的知识盲区。",date:"昨天 21:06",ts:Date.now()-1000*60*60*26},
-  {type:"阅读",text:"读书不是为了拥有更多答案，而是让问题变得越来越准确。",date:"08-13",ts:Date.now()-1000*60*60*50},
-  {type:"日记",text:"今天下了雨。没有发生什么特别糟糕的事情，只是突然觉得很累。",weather:"🌧",date:"08-12",ts:Date.now()-1000*60*60*74},
-  {type:"想法",text:"“我最近很害怕浪费时间。”",date:"2026-03",ts:Date.parse("2026-03-15")},
-  {type:"想法",text:"“开始准备研究生考试。”",date:"2026-05",ts:Date.parse("2026-05-20")},
-  {type:"知识",text:"“第一次真正看懂一篇综述。”",date:"2026-07",ts:Date.parse("2026-07-08")},
-  {type:"想法",text:"“原来我已经走了这么远。”",date:"2026-08",ts:Date.parse("2026-08-02")}
- ],
+ notes:[],
  plans:{
   "医学基础":{icon:"🩺",items:[
-   {name:"生理学",done:22,total:30},{name:"病理学",done:10,total:30},{name:"药理学",done:8,total:25}]},
+   {name:"生理学",done:0,total:30},{name:"病理学",done:0,total:30},{name:"药理学",done:0,total:25}]},
   "妇产科学":{icon:"🌸",items:[
-   {name:"妇科肿瘤",done:6,total:20},{name:"产科学",done:4,total:20},{name:"妇科内分泌",done:3,total:15}]},
+   {name:"妇科肿瘤",done:0,total:20},{name:"产科学",done:0,total:20},{name:"妇科内分泌",done:0,total:15}]},
   "科研":{icon:"🔬",items:[
-   {name:"文献检索",done:12,total:15},{name:"Zotero",done:8,total:10},{name:"统计学",done:5,total:20},{name:"SCI 阅读",done:7,total:20}]}
+   {name:"文献检索",done:0,total:15},{name:"Zotero",done:0,total:10},{name:"统计学",done:0,total:20},{name:"SCI 阅读",done:0,total:20}]}
  },
- base:{dandelions:120,trees:12,read:36,knowledge:1200,focusMin:2820},
+ base:{dandelions:0,trees:0,read:0,knowledge:0,focusMin:0},
  focusMin:0,focusCount:0
 });
 
@@ -288,7 +279,7 @@ function touchDay(){
 }
 
 const dandelionCount=()=>state.base.dandelions+state.notes.length;
-const knowledgeCount=()=>state.base.knowledge+state.notes.filter(n=>n.type==="知识").length*10;
+const knowledgeCount=()=>state.base.knowledge+state.notes.filter(n=>n.type==="知识").length;
 const readCount=()=>state.base.read+state.notes.filter(n=>n.type==="阅读").length;
 const focusMin=()=>state.base.focusMin+state.focusMin;
 
@@ -324,7 +315,8 @@ function home(){
 function foxCard(){
  let msg;
  const h=new Date().getHours();
- if(h>=23||h<5) msg="这么晚还在呀。慢慢来，你今天已经做得够多了，剩下的交给明天。";
+ if(!state.notes.length&&state.streak<1) msg="这里还什么都没有。别着急，从记下第一个念头开始吧。";
+ else if(h>=23||h<5) msg="这么晚还在呀。慢慢来，你今天已经做得够多了，剩下的交给明天。";
  else if(h<8) msg="清晨的风很安静。适合先记下第一个念头，再开始一天。";
  else if(dandelionCount()>state.base.dandelions+3) msg="你最近留下的东西越来越多了。回头看的时候，它们会长成一片原野。";
  else msg="你最近连续几天都在晚上学习。看起来，你更适合把需要深度思考的事情留到夜晚。";
@@ -339,13 +331,17 @@ function dandelion(){
  const list=activeFilter==="全部"?state.notes:state.notes.filter(n=>n.type===activeFilter);
  return `${hdr("你的蒲公英原野",`全部记录 · ${total} 颗`)}
  <div class="card soft"><div class="sub">蒲公英总数</div><div style="font-size:42px;font-weight:800;margin:2px 0">${total}</div><div class="sub">每一个念头，都值得被留下。</div></div>
- <div class="card"><div class="sub" style="margin-bottom:6px">原野一角</div><div class="field">${fieldMarkup(total)}</div></div>
+ <div class="card"><div class="sub" style="margin-bottom:6px">原野一角</div>${total?`<div class="field">${fieldMarkup(total)}</div>`:`<div class="emptyNote">原野还空着。写下一颗蒲公英，它就会在这里扎根。</div>`}</div>
  <div class="row">${types.map(t=>`<button class="chip ${activeFilter===t?"selected":""}" onclick="setFilter('${t}')">${t}</button>`).join("")}</div>
  ${list.length?list.map(n=>noteCard(n)).join(""):`<div class="empty"><b>🌱</b>这里还空空的。<br>按右下角的 ＋，种下第一颗蒲公英吧。</div>`}`;
 }
 function noteCard(n){
  const cls=n.type==="知识"?"orange":n.type==="阅读"?"blue":n.type==="情绪"?"purple":"";
- return `<div class="listCard"><div class="d"><span>${n.type==="情绪"?(n.weather||"💭"):""} ${n.date}</span></div><p>${n.text}</p><span class="tag ${cls}">${n.type}</span></div>`;
+ return `<div class="listCard"><div class="d"><span>${n.type==="情绪"?(n.weather||"💭"):""} ${n.date}</span><button onclick="delNote('${n.id}')" style="margin-left:auto;color:var(--muted);font-size:15px;line-height:1;padding:2px 6px" title="删除这条">✕</button></div><p>${n.text}</p><span class="tag ${cls}">${n.type}</span></div>`;
+}
+function delNote(id){
+ const i=state.notes.findIndex(n=>n.id===id);
+ if(i>-1){state.notes.splice(i,1);save();render();toast("蒲公英飞走了，祝它去更远的地方。");}
 }
 function fieldMarkup(total){
  const show=Math.min(total,42);
@@ -428,11 +424,11 @@ function me(){
  </div>
  <div class="card"><h3>🌱 成长阶段</h3><div class="stage">${st.map(s=>`<div class="${s.now?"now":""}"><b>${s.icon}</b><small>${s.label}</small></div>`).join("")}</div><p class="sub" style="margin-top:10px">${stageNote(state.streak)}</p></div>
  <div class="card soft"><h3>🍃 蒲公英之间的风</h3>${windMarkup()}</div>
- <div class="card">${["我的森林","收藏","数据统计","设置与偏好","关于我们"].map((x,i)=>`<div class="task"><div style="font-size:19px">${["🌳","☆","▥","⚙","♡"][i]}</div><div class="taskText"><b>${x}</b></div><div style="color:var(--muted)">›</div></div>`).join("")}</div>`;
+ <div class="card"><div class="task"><div style="font-size:19px">♡</div><div class="taskText"><b>关于我们</b></div><div style="color:var(--muted)">›</div></div></div>`;
 }
 function stageInfo(s){
  const defs=[[7,"🌱","小草"],[30,"🌼","蒲公英"],[90,"🌳","小树"],[365,"🌲","森林"]];
- let nowIdx=0;defs.forEach((d,i)=>{if(s>=d[0])nowIdx=i});
+ let nowIdx=-1;defs.forEach((d,i)=>{if(s>=d[0])nowIdx=i});
  return defs.map((d,i)=>({icon:d[1],label:d[2],now:i===nowIdx}));
 }
 function stageNote(s){
@@ -481,7 +477,7 @@ function saveNote(){
  const text=document.getElementById("newText").value.trim();
  if(!text){toast("先写一点点吧。");return}
  if(modalType==="情绪"&&!weather){toast("先选一个今天的天气吧。");return}
- const n={type:modalType,text,date:fmtDate(new Date())+" "+fmtTime(new Date()),ts:Date.now()};
+ const n={id:"n"+Date.now()+"-"+Math.floor(Math.random()*1e4),type:modalType,text,date:fmtDate(new Date())+" "+fmtTime(new Date()),ts:Date.now()};
  if(modalType==="情绪")n.weather=weather||"💭";
  state.notes.unshift(n);
  document.getElementById("newText").value="";closeModal();
