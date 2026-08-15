@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f7f4ee">
+<title>狐狸的蒲公英</title>
+<style>
+:root{
+  --cream:#f7f4ee;--paper:#fffdf8;--green:#8faa79;--green2:#a7c99a;
+  --orange:#e99543;--yellow:#ffe5a2;--blue:#8fb1d6;--brown:#5b5149;
+  --muted:#958c82;--line:#e8e0d4;--shadow:0 10px 30px rgba(88,75,58,.08);
+}
+*{box-sizing:border-box} body{margin:0;background:#dedbd4;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Noto Sans SC",sans-serif;color:var(--brown)}
+button,input,textarea{font:inherit}
+button{border:0;background:none;color:inherit}
+.app{width:min(100%,430px);height:100vh;margin:auto;background:var(--cream);position:relative;overflow:hidden}
+.screen{height:100%;overflow:auto;padding:env(safe-area-inset-top) 18px calc(88px + env(safe-area-inset-bottom));scrollbar-width:none}
+.screen::-webkit-scrollbar{display:none}
+.top{display:flex;justify-content:space-between;align-items:center;padding:22px 2px 12px}
+.eyebrow{font-size:13px;color:var(--muted)}h1{font-size:25px;margin:4px 0;font-weight:750}h2{font-size:20px;margin:20px 0 12px}h3{font-size:16px;margin:0 0 6px}.avatar{width:42px;height:42px;border-radius:50%;background:#f5d38c;display:grid;place-items:center;font-size:23px;border:2px solid #fff}
+.hero{height:260px;border-radius:28px;position:relative;overflow:hidden;background:linear-gradient(165deg,#6f8aa7 0%,#a8b7bc 45%,#8da574 100%);box-shadow:var(--shadow)}
+.hero:before{content:"";position:absolute;inset:0;background:
+ radial-gradient(circle at 18% 20%,rgba(255,255,255,.8) 0 2px,transparent 3px),
+ radial-gradient(circle at 70% 28%,rgba(255,255,255,.8) 0 2px,transparent 3px),
+ radial-gradient(circle at 86% 15%,rgba(255,255,255,.6) 0 1px,transparent 2px);
+}
+.moon{position:absolute;right:26px;top:25px;width:48px;height:48px;border-radius:50%;background:#fff4cf;opacity:.9}
+.meadow{position:absolute;bottom:-45px;left:-10%;width:120%;height:130px;background:#789567;border-radius:50% 50% 0 0}
+.fox{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);font-size:76px;filter:drop-shadow(0 7px 6px rgba(0,0,0,.12))}
+.dandelion{position:absolute;color:#fff9e7;font-size:29px;animation:float 5s ease-in-out infinite}
+.d1{left:14%;top:38%}.d2{right:18%;top:48%;animation-delay:1s}.d3{left:72%;top:20%;animation-delay:2s}.d4{left:36%;top:12%;animation-delay:3s}
+@keyframes float{50%{transform:translateY(-10px) rotate(5deg)}}
+.heroText{position:absolute;left:22px;top:20px;color:white;text-shadow:0 1px 4px rgba(0,0,0,.18)}
+.heroText b{font-size:17px}.heroText p{margin:5px 0;font-size:12px;opacity:.9}
+.growth{position:absolute;right:18px;bottom:20px;background:rgba(255,253,248,.92);border-radius:18px;padding:11px 14px;text-align:center}.growth b{font-size:28px;display:block}.growth span{font-size:11px;color:var(--muted)}
+.card{background:var(--paper);border:1px solid rgba(232,224,212,.8);border-radius:20px;padding:16px;box-shadow:var(--shadow);margin:12px 0}
+.task{display:flex;align-items:center;gap:11px;padding:12px 0;border-bottom:1px solid var(--line)}.task:last-child{border-bottom:0}.check{width:24px;height:24px;border:1.5px solid #cdbfae;border-radius:50%;display:grid;place-items:center;flex:none}.task.done .check{background:var(--green);color:white;border-color:var(--green)}.taskText{flex:1}.taskText b{font-size:14px;display:block}.taskText small{color:var(--muted)}.progress{font-size:11px;color:var(--muted)}
+.sectionTitle{display:flex;justify-content:space-between;align-items:center;margin-top:20px}.sectionTitle button{color:var(--green);font-size:13px}
+.nav{position:absolute;left:12px;right:12px;bottom:12px;height:66px;background:rgba(255,253,248,.96);border:1px solid var(--line);border-radius:24px;display:grid;grid-template-columns:repeat(5,1fr);box-shadow:0 12px 35px rgba(60,50,40,.12);z-index:20}
+.nav button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11px;color:#91887e}.nav button span{font-size:20px}.nav button.active{color:#668151;font-weight:700}
+.listCard{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:15px;margin:10px 0}.tag{display:inline-block;padding:4px 9px;border-radius:20px;background:#edf3e9;color:#668151;font-size:11px;margin-top:8px}.tag.orange{background:#fff0dd;color:#b66b25}.tag.blue{background:#eaf1f8;color:#5c7fa4}
+.fab{position:fixed;right:max(24px,calc((100vw - 430px)/2 + 24px));bottom:94px;width:54px;height:54px;border-radius:50%;background:var(--green);color:white;font-size:27px;box-shadow:0 10px 25px rgba(83,105,68,.25);z-index:15}
+.timer{display:grid;place-items:center;padding:25px 0}.timerRing{width:210px;height:210px;border-radius:50%;border:9px solid #dfe9d9;display:grid;place-items:center;background:#fffdf8}.timerRing b{font-size:40px;font-weight:500}.timerRing small{display:block;text-align:center;color:var(--muted)}
+.primary{width:100%;padding:14px;border-radius:16px;background:var(--green);color:#fff;font-weight:700;cursor:pointer}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stat{background:var(--paper);padding:16px;border-radius:18px;border:1px solid var(--line)}.stat b{font-size:25px;display:block}.stat small{color:var(--muted)}
+.forest{height:250px;border-radius:26px;position:relative;overflow:hidden;background:linear-gradient(#879fbb 0 40%,#a6bd8c 40%);border:1px solid var(--line)}.forest:after{content:"";position:absolute;bottom:-70px;left:-10%;width:120%;height:160px;border-radius:50%;background:#6f8e61}.tree{position:absolute;bottom:20px;font-size:90px}.tree.t1{left:12px}.tree.t2{right:25px;font-size:110px}.tree.t3{left:40%;bottom:25px;font-size:72px}.forestFox{position:absolute;z-index:3;bottom:25px;left:48%;font-size:45px}
+.modal{position:absolute;inset:0;background:rgba(50,45,40,.35);z-index:30;display:none;align-items:flex-end}.modal.show{display:flex}.sheet{width:100%;background:var(--cream);border-radius:28px 28px 0 0;padding:20px 18px 30px}.sheet h2{margin-top:0}.sheet textarea{width:100%;min-height:120px;border:1px solid var(--line);border-radius:18px;padding:14px;background:#fffdf8;resize:none;outline:none}.row{display:flex;gap:9px;margin:12px 0}.chip{padding:8px 12px;border-radius:18px;background:#eee8de;font-size:12px}.chip.selected{background:#dfead9;color:#587249}
+.toast{position:absolute;left:50%;bottom:92px;transform:translateX(-50%) translateY(20px);background:#4f5f49;color:white;padding:10px 16px;border-radius:18px;font-size:13px;opacity:0;pointer-events:none;transition:.25s;z-index:40;white-space:nowrap}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.empty{text-align:center;padding:35px 10px;color:var(--muted)}.empty b{font-size:45px;display:block;margin-bottom:8px}
+</style>
+</head>
+<body>
+<div class="app">
+  <main id="screen" class="screen"></main>
+
+  <button class="fab" id="fab" onclick="openModal()">＋</button>
+
+  <nav class="nav">
+    <button data-tab="home" onclick="go('home')"><span>⌂</span>首页</button>
+    <button data-tab="dandelion" onclick="go('dandelion')"><span>🌼</span>蒲公英</button>
+    <button data-tab="study" onclick="go('study')"><span>📖</span>学习</button>
+    <button data-tab="ideas" onclick="go('ideas')"><span>🍃</span>想法</button>
+    <button data-tab="me" onclick="go('me')"><span>🦊</span>我的</button>
+  </nav>
+
+  <div class="modal" id="modal">
+    <div class="sheet">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <h2>种下一颗蒲公英</h2><button onclick="closeModal()" style="font-size:24px">×</button>
+      </div>
+      <p style="color:var(--muted);font-size:13px">今天有什么想留下来？</p>
+      <div class="row" id="chips">
+        <button class="chip selected" onclick="selectChip(this)">想法</button>
+        <button class="chip" onclick="selectChip(this)">知识</button>
+        <button class="chip" onclick="selectChip(this)">阅读</button>
+        <button class="chip" onclick="selectChip(this)">日记</button>
+      </div>
+      <textarea id="newText" placeholder="写下这一刻……"></textarea>
+      <button class="primary" onclick="saveNote()">让它飞出去 🌼</button>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+const state={
+ tab:"home",
+ tasks:[
+  ["读一页书","20 / 20 min",true],["学习 45 分钟","30 / 45 min",false],
+  ["背诵知识点","30 / 50 个",false],["记录一个想法","1 / 1 条",true],["夜晚的话","0 / 1 条",false]
+ ],
+ notes:[
+  {type:"想法",text:"人真正害怕的也许不是失去时间，而是发现时间过去以后，自己没有留下任何东西。",date:"今天 18:20"},
+  {type:"知识",text:"把一个知识点讲给别人听，往往比重复阅读更容易发现自己的知识盲区。",date:"昨天 21:06"},
+  {type:"阅读",text:"读书不是为了拥有更多答案，而是让问题变得越来越准确。",date:"08.13"}
+ ]
+};
+
+function go(tab){state.tab=tab;render();document.getElementById("screen").scrollTop=0}
+function render(){
+ document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.tab===state.tab));
+ const s=document.getElementById("screen");
+ const views={home:home,dandelion:dandelion,study:study,ideas:ideas,me:me};
+ s.innerHTML=views[state.tab]();
+ document.getElementById("fab").style.display=state.tab==="home"||state.tab==="dandelion"||state.tab==="ideas"?"block":"none";
+}
+function top(title,sub=""){return `<div class="top"><div><div class="eyebrow">${sub}</div><h1>${title}</h1></div><div class="avatar">🦊</div></div>`}
+function home(){return `${top("晚上好，小狐狸。","2026 · 08 · 15")}
+<div class="hero">
+ <div class="heroText"><b>今天也有蒲公英等着你。</b><p>把一点点成长留下来。</p></div>
+ <div class="moon"></div><div class="dandelion d1">✽</div><div class="dandelion d2">✽</div><div class="dandelion d3">✽</div><div class="dandelion d4">✽</div>
+ <div class="meadow"></div><div class="fox">🦊</div>
+ <div class="growth"><b>17</b><span>连续记录 · 天</span></div>
+</div>
+<div class="sectionTitle"><h2>今日任务</h2><button onclick="go('study')">查看学习 →</button></div>
+<div class="card">${state.tasks.map((t,i)=>`<div class="task ${t[2]?'done':''}" onclick="toggleTask(${i})"><div class="check">${t[2]?'✓':''}</div><div class="taskText"><b>${t[0]}</b><small>${t[1]}</small></div><div class="progress">${t[2]?'完成':'进行中'}</div></div>`).join("")}</div>
+<div class="card"><h3>🦊 狐狸观察了一下</h3><p style="margin:5px 0;color:var(--muted);font-size:13px;line-height:1.7">你最近连续几天都在晚上学习。看起来，你更适合把需要深度思考的事情留到夜晚。</p></div>`}
+function dandelion(){return `${top("你的蒲公英原野","全部记录 · ${state.notes.length+125} 颗")}
+<div class="card" style="background:linear-gradient(135deg,#fff8e3,#f0f5e9)"><div style="font-size:12px;color:var(--muted)">蒲公英总数</div><div style="font-size:40px;font-weight:750;margin:2px 0">${state.notes.length+125}</div><div style="font-size:12px;color:#718268">每一个念头，都值得被留下。</div></div>
+<div class="row"><span class="chip selected">全部</span><span class="chip">想法</span><span class="chip">知识</span><span class="chip">阅读</span></div>
+${state.notes.map(n=>`<div class="listCard"><div style="font-size:11px;color:var(--muted)">${n.date}</div><h3 style="margin-top:7px">${n.text}</h3><span class="tag ${n.type==='知识'?'orange':n.type==='阅读'?'blue':''}">${n.type}</span></div>`).join("")}` }
+function study(){return `${top("让今天长出一点东西。","专注 · 计划 · 统计")}
+<div class="card">
+ <div class="row" style="justify-content:center"><span class="chip selected">专注</span><span class="chip">计划</span><span class="chip">统计</span></div>
+ <div class="timer"><div class="timerRing"><div><b id="time">45:00</b><small>专注时间</small></div></div></div>
+ <button class="primary" onclick="startTimer()">开始专注</button>
+</div>
+<h2>今日计划</h2><div class="card">
+${state.tasks.slice(0,4).map((t,i)=>`<div class="task ${t[2]?'done':''}"><div class="check">${t[2]?'✓':''}</div><div class="taskText"><b>${t[0]}</b><small>${t[1]}</small></div></div>`).join("")}
+</div>
+<h2>学习领域</h2><div class="grid2"><div class="stat"><b>📚 36</b><small>本月阅读</small></div><div class="stat"><b>🧠 1,280</b><small>累计知识点</small></div></div>`}
+function ideas(){return `${top("今天想说什么？","想法 · 情绪 · 日记 · 灵感")}
+<div class="card"><h2 style="margin-top:0">留下一点什么</h2><p style="color:var(--muted);line-height:1.7;font-size:13px">不需要写得漂亮。先留下来，之后再慢慢理解它。</p><button class="primary" onclick="openModal()">＋ 写下一颗蒲公英</button></div>
+<h2>最近的想法</h2>${state.notes.filter(n=>n.type==='想法'||n.type==='日记').map(n=>`<div class="listCard"><div style="font-size:11px;color:var(--muted)">${n.date}</div><p style="line-height:1.8;margin:8px 0">${n.text}</p><span class="tag">${n.type}</span></div>`).join("")}
+<div class="empty"><b>🌙</b>夜晚适合把声音留给自己。</div>`}
+function me(){return `${top("我的森林","小狐狸")}
+<div class="forest"><div class="tree t1">🌳</div><div class="tree t2">🌲</div><div class="tree t3">🌳</div><div class="forestFox">🦊</div></div>
+<div class="card" style="margin-top:12px"><h3>你已经收集了很多东西。</h3><p style="color:var(--muted);font-size:13px;line-height:1.7;margin-bottom:0">这些数字不是成绩，它们只是提醒你：你确实走过了这段路。</p></div>
+<div class="grid2"><div class="stat"><b>${state.notes.length+125}</b><small>蒲公英</small></div><div class="stat"><b>17</b><small>连续记录</small></div><div class="stat"><b>45h</b><small>学习时间</small></div><div class="stat"><b>12</b><small>知识树</small></div></div>
+<div class="card">${["我的森林","收藏","数据统计","设置与偏好","关于我们"].map(x=>`<div class="task"><div style="font-size:19px">${x==="我的森林"?"🌳":x==="收藏"?"☆":x==="数据统计"?"▥":x==="设置与偏好"?"⚙":"♡"}</div><div class="taskText"><b>${x}</b></div><div>›</div></div>`).join("")}</div>`}
+function toggleTask(i){state.tasks[i][2]=!state.tasks[i][2];render();toast(state.tasks[i][2]?"🌼 一颗蒲公英长出来了":"把它留给明天也没关系。")}
+let timer=null,seconds=2700;
+function startTimer(){
+ if(timer){clearInterval(timer);timer=null;toast("专注暂停了，休息一下吧。");return}
+ toast("🦊 小狐狸陪你专注 45 分钟");
+ timer=setInterval(()=>{seconds--;let m=String(Math.floor(seconds/60)).padStart(2,"0"),s=String(seconds%60).padStart(2,"0");const el=document.getElementById("time");if(el)el.textContent=m+":"+s;if(seconds<=0){clearInterval(timer);timer=null;seconds=2700;toast("🌼 完成！今天又长出一颗蒲公英。");}},1000)
+}
+function openModal(){document.getElementById("modal").classList.add("show");document.getElementById("newText").focus()}
+function closeModal(){document.getElementById("modal").classList.remove("show")}
+function selectChip(el){document.querySelectorAll("#chips .chip").forEach(x=>x.classList.remove("selected"));el.classList.add("selected")}
+function saveNote(){
+ const text=document.getElementById("newText").value.trim(); if(!text){toast("先写一点点吧。");return}
+ const type=document.querySelector("#chips .selected").textContent;
+ state.notes.unshift({type,text,date:"刚刚"});document.getElementById("newText").value="";closeModal();go("dandelion");toast("🌼 蒲公英已经飞出去了。")
+}
+function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1800)}
+render();
+</script>
+</body>
+</html>
