@@ -322,7 +322,13 @@ function noteCard(n){
 }
 function delNote(id){
  const i=state.notes.findIndex(n=>n.id===id);
- if(i>-1){state.notes.splice(i,1);save();render();toast("蒲公英飞走了，祝它去更远的地方。");}
+ if(i>-1){
+  state.notes.splice(i,1);
+  deletedIds.add(id);saveDeleted();
+  save();render();
+  toast("蒲公英飞走了，祝它去更远的地方。");
+  cloudDelete(id).catch(()=>{});
+ }
 }
 function fieldMarkup(total){
  const show=Math.min(total,42);
@@ -368,6 +374,43 @@ function me(){
 function openAbout(){document.getElementById("about").classList.add("show")}
 function closeAbout(){document.getElementById("about").classList.remove("show")}
 
+/* ===== 云端同步（所有设备共享同一份记录） ===== */
+const SUPABASE_URL="https://ulvlphsgmyosxgqulgjz.supabase.co";
+const SUPABASE_KEY="sb_publishable_GbItMxSmGeIklFxmCs8gOA_sTOx5G_-";
+let deletedIds=new Set();
+try{deletedIds=new Set(JSON.parse(localStorage.getItem("fox_dandelion_deleted")||"[]"))}catch(e){}
+function saveDeleted(){try{localStorage.setItem("fox_dandelion_deleted",JSON.stringify([...deletedIds]))}catch(e){}}
+function sbHeaders(){return {"apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY,"Content-Type":"application/json","Accept":"application/json"}}
+async function cloudFetch(){
+ const r=await fetch(SUPABASE_URL+"/rest/v1/dandelion?select=*&order=ts.desc",{headers:sbHeaders()});
+ if(!r.ok)throw new Error("fetch "+r.status);
+ return await r.json();
+}
+async function cloudAdd(note){
+ const r=await fetch(SUPABASE_URL+"/rest/v1/dandelion",{method:"POST",headers:Object.assign(sbHeaders(),{"Prefer":"resolution=ignore-duplicates"}),body:JSON.stringify({id:note.id,type:note.type,text:note.text,date:note.date,weather:note.weather||null,ts:note.ts})});
+ if(!r.ok)throw new Error("add "+r.status);
+}
+async function cloudDelete(id){
+ const r=await fetch(SUPABASE_URL+"/rest/v1/dandelion?id=eq."+encodeURIComponent(id),{method:"DELETE",headers:sbHeaders()});
+ if(!r.ok)throw new Error("del "+r.status);
+}
+async function syncCloud(){
+ try{
+  const beforeLen=state.notes.length;
+  const cloud=await cloudFetch();
+  const cloudIds=new Set(cloud.map(n=>n.id));
+  for(const n of cloud){if(deletedIds.has(n.id)){try{await cloudDelete(n.id)}catch(e){}}}
+  const local=state.notes.filter(n=>!cloudIds.has(n.id)&&!deletedIds.has(n.id));
+  for(const n of local){try{await cloudAdd(n)}catch(e){}}
+  const seen=new Set();const out=[];
+  const merged=cloud.filter(n=>!deletedIds.has(n.id)).concat(local);
+  for(const n of merged){if(!seen.has(n.id)){seen.add(n.id);out.push(n)}}
+  out.sort((a,b)=>(b.ts||0)-(a.ts||0));
+  state.notes=out;save();render();
+  if(out.length!==beforeLen||local.length>0)toast("☁️ 已同步云端，所有设备都能看到");
+ }catch(e){console.log("sync failed",e)}
+}
+
 /* ===== 交互 ===== */
 function toggleTask(i){
  const t=state.tasks[i];
@@ -410,6 +453,7 @@ function saveNote(){
  document.getElementById("newText").value="";closeModal();
  save();go("dandelion");
  toast("🌼 蒲公英已经飞出去了。");
+ cloudAdd(n).catch(()=>{});
 }
 
 let toastTimer;
@@ -418,6 +462,7 @@ function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t
 state=load();
 initDay();
 render();
+syncCloud();
 </script>
 </body>
 </html>
