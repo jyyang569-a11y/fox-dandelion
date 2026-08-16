@@ -1,4 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#F7F4EE">
+<title>狐狸的蒲公英</title>
+<style>
+:root{
+  --cream:#F7F4EE; --paper:#FFFDF8;
+  --sage:#A7D8A0; --sage-deep:#6F9A66; --sage-ink:#587249;
+  --orange:#F4A340; --orange-deep:#B66B25;
+  --yellow:#FFE9A8; --blue:#8FB7E3; --blue-deep:#5C7FA4;
+  --brown:#5E544F; --muted:#9A8F84; --line:#E8E0D4;
+  --shadow:0 10px 28px rgba(94,84,79,.09);
+  --r:22px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:"PingFang SC","Noto Sans SC","Microsoft YaHei",-apple-system,BlinkMacSystemFont,sans-serif;background:#E7E2D8;color:var(--brown);-webkit-font-smoothing:antialiased}
+button{font:inherit;border:0;background:none;color:inherit;cursor:pointer}
+textarea,input{font:inherit}
+.hand{font-family:"LXGW WenKai","STKaiti","KaiTi","PingFang SC",serif}
+.app{position:relative;width:min(100%,430px);height:100dvh;margin:0 auto;background:var(--cream);overflow:hidden;box-shadow:0 0 44px rgba(94,84,79,.16)}
+.screen{height:100%;overflow-y:auto;padding:env(safe-area-inset-top) 18px calc(98px + env(safe-area-inset-bottom));scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.screen::-webkit-scrollbar{display:none}
 
+/* ===== top bar ===== */
+.top{display:flex;align-items:center;justify-content:space-between;padding:24px 2px 14px}
+.top h1{font-size:24px;font-weight:800;letter-spacing:.4px}
+.top h1.greet{font-family:"LXGW WenKai","STKaiti","KaiTi","PingFang SC",serif;font-size:27px;font-weight:800;letter-spacing:1px;color:#D9802E}
+@supports (-webkit-background-clip:text) or (background-clip:text){
+ .top h1.greet{background:linear-gradient(120deg,#E8954C 0%,#F4A340 55%,#E8954C 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+}
+.eyebrow{font-size:12px;color:var(--muted);letter-spacing:1.5px;margin-bottom:3px}
+.avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#FBE3B0,#F4C56C);display:grid;place-items:center;font-size:24px;box-shadow:0 6px 14px rgba(180,130,60,.28);flex:none}
 
 /* ===== 首页插画（黄昏原野 · 小狐狸） ===== */
 .hero{position:relative;height:308px;border-radius:30px;overflow:hidden;background:linear-gradient(180deg,#8FB7E3 0%,#AFC8E2 30%,#F0D9B6 58%,#AAC98F 78%,#7E9C6D 100%);box-shadow:var(--shadow)}
