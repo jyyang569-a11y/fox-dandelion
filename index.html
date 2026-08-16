@@ -291,6 +291,13 @@ h3{font-size:15px;font-weight:700;margin:0 0 6px}
 .confirmBox .ico{font-size:40px;margin-bottom:8px}
 .confirmBox h3{font-size:16px;margin-bottom:6px}
 .confirmBox p{color:var(--muted);font-size:12.5px;line-height:1.7;margin-bottom:16px}
+
+.poemBox{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:88%;z-index:3;text-align:center;padding:9px 12px;border-radius:16px;background:rgba(255,255,255,.16);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);cursor:pointer;border:1px solid rgba(255,255,255,.28)}
+.poemText{font-family:"LXGW WenKai","STKaiti","KaiTi",serif;font-size:11.5px;line-height:1.75;color:#fff;text-shadow:0 1px 3px rgba(60,70,90,.45);letter-spacing:.5px;min-height:42px}
+.poemText.in{animation:poemIn .55s ease forwards}
+@keyframes poemIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.poemPart{position:absolute;pointer-events:none;font-family:"LXGW WenKai","STKaiti","KaiTi",serif;font-size:11.5px;color:#fff;text-shadow:0 1px 3px rgba(60,70,90,.45);animation:poemPart .7s ease-out forwards}
+@keyframes poemPart{0%{opacity:1}100%{opacity:0;transform:translate(var(--px),var(--py)) rotate(var(--pr,10deg)) scale(.3)}}
 </style>
 </head>
 <body>
@@ -527,6 +534,7 @@ function render(){
  const views={home,dandelion,me};
  document.getElementById("screen").innerHTML=views[state.tab]();
  document.getElementById("fab").style.display=state.tab==="me"?"none":"grid";
+ if(state.tab==="me")startPoem(); else stopPoem();
 }
 
 /* ===== 首页 ===== */
@@ -705,7 +713,7 @@ function windMarkup(){
  if(!list.length) return `<p class="sub" style="margin-top:8px">再多留下一些蒲公英，风会把它们串成一条路。</p>`;
  const first=list[0],last=list[list.length-1];
  const days=Math.max(1,Math.round((last.ts-first.ts)/86400000));
- const line=days>=120?"四个月前的你，大概不会想到今天的自己。":days>=60?"两个月前种下的念头，正在慢慢发芽。":days>=14?"两周前的你，正在一点点变成现在的你。":"每一次记录，都在悄悄改变着以后的自己。";
+ const line=days>=120?"四个月前的你，大概不会想到今天的自己。":days>=60?"两个月前种下的念头，正在慢慢发芽。":days>=14?"两周前的你，正在一点点变成现在的你。":"万物与我都是荒诞的静寂，此刻我很想你";
  return `<div class="wind">${list.map(n=>`<div class="node"><small>${n.date}</small><p>${n.text}</p></div>`).join("")}</div><div class="windEnd">${line}</div>`;
 }
 
@@ -714,6 +722,7 @@ function me(){
  const total=dandelionCount();
  return `${hdr("我的森林",`小狐狸 · 已经收集了 ${total} 颗蒲公英`)}
  <div class="forest ${skyClass()}">
+  <div class="poemBox" id="poemBox" onclick="poemNext()" title="点一下换一句"><div class="poemText in" id="poemText">${POEMS[poemIdx]}</div></div>
   <div class="fcloud fc1"></div><div class="fcloud fc2"></div>
   <div class="fhill f1"></div><div class="fhill f2"></div>
   ${puffMarkup()}
@@ -791,6 +800,47 @@ async function syncCloud(manual){
   if(out.length!==beforeLen||local.length>0||manual)toast(manual?"☁️ 云存档已同步":"☁️ 已同步云端，所有设备都能看到");
  }catch(e){console.log("sync failed",e)}
  if(cbtn)cbtn.classList.remove("syncing");
+}
+
+/* ===== 我的页小诗 ===== */
+const POEMS=[
+ "请向我靠近，大步流星。",
+ "用一个名字，现叫开我十万公顷，再叫坏长亭短亭，然后把柳絮，江水，日暮统统叫走，让所有的离别诗都失去眼睛。",
+ "当你向我靠近，你的每个脚步，都踏进我生命。"
+];
+let poemIdx=0,poemTimer=null,poemBusy=false;
+function startPoem(){if(poemTimer||poemBusy)return;poemTimer=setTimeout(()=>{poemTimer=null;switchPoem((poemIdx+1)%POEMS.length)},5200)}
+function stopPoem(){if(poemTimer){clearTimeout(poemTimer);poemTimer=null}}
+function poemNext(){stopPoem();switchPoem((poemIdx+1)%POEMS.length)}
+function switchPoem(i){
+ if(poemBusy)return;
+ poemBusy=true;
+ const box=document.getElementById("poemBox"),el=document.getElementById("poemText");
+ if(!box||!el){poemIdx=i;poemBusy=false;return}
+ const text=el.textContent||"";
+ const bbox=box.getBoundingClientRect();
+ if(text.trim()&&bbox.width){
+  const node=el.firstChild||el;
+  const rects=[];
+  for(let k=0;k<text.length;k++){
+   try{const r=document.createRange();r.setStart(node,k);r.setEnd(node,k+1);const rc=r.getBoundingClientRect();if(rc.width>0&&rc.height>0)rects.push({ch:text[k],x:rc.left-bbox.left,y:rc.top-bbox.top})}catch(e){}
+  }
+  el.textContent="";
+  rects.forEach(p=>{
+   const sp=document.createElement("span");
+   sp.className="poemPart";sp.textContent=p.ch;
+   sp.style.left=p.x+"px";sp.style.top=p.y+"px";
+   sp.style.setProperty("--px",((Math.random()*2-1)*52).toFixed(0)+"px");
+   sp.style.setProperty("--py",((Math.random()*2-1)*46-16).toFixed(0)+"px");
+   sp.style.setProperty("--pr",((Math.random()*2-1)*34).toFixed(0)+"deg");
+   sp.style.animationDelay=(Math.random()*0.14).toFixed(2)+"s";
+   box.appendChild(sp);
+   setTimeout(()=>sp.remove(),850);
+  });
+  setTimeout(()=>{poemIdx=i;el.textContent=POEMS[i];el.classList.remove("in");void el.offsetWidth;el.classList.add("in");poemBusy=false;if(document.getElementById("poemBox"))startPoem();},600);
+ }else{
+  poemIdx=i;el.textContent=POEMS[i];el.classList.remove("in");void el.offsetWidth;el.classList.add("in");poemBusy=false;startPoem();
+ }
 }
 
 /* ===== 交互 ===== */
