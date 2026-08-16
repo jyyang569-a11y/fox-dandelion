@@ -336,11 +336,6 @@ h3{font-size:15px;font-weight:700;margin:0 0 6px}
           <button class="wchip" data-w="🌪" onclick="pickWeather(this)">🌪</button>
         </div>
       </div>
-      <p class="sub" style="margin:10px 0 4px">这条是谁写的？</p>
-      <div class="row" id="authorChips">
-        <button class="chip" data-a="me" onclick="selectAuthor(this)">🍃 一一</button>
-        <button class="chip" data-a="huye" onclick="selectAuthor(this)">🦊 晔晔</button>
-      </div>
       <textarea id="newText" placeholder="写下这一刻……"></textarea>
       <button class="primary" onclick="saveNote()">让它飞出去 🌼</button>
     </div>
@@ -585,7 +580,9 @@ function dandelion(){
   <div class="totalCard"><div class="t-ico">${dandSVG(34)}</div><div class="t-label">蒲公英总数</div><div class="t-num">${total}</div><div class="t-sub">每一朵都算数</div></div>
   <div class="calCard">${calendarHTML()}</div>
  </div>
- <div class="card fieldCard"><div class="sub" style="margin-bottom:6px">原野一角</div>${total?`<div class="field">${fieldMarkup(total)}</div>`:`<div class="emptyNote">原野还空着。写下一颗蒲公英，它就会在这里扎根。</div>`}</div>
+ <div class="card"><h3>我是谁</h3><p class="sub" style="margin-top:2px">发表的内容会带上你的头像</p>
+  <div class="row">${[["me","🍃 一一"],["huye","🦊 晔晔"]].map(x=>`<button class="chip ${identity===x[0]?"selected":""}" onclick="setIdentity('${x[0]}')">${x[1]}</button>`).join("")}</div>
+ </div>
  <div class="row">${types.map(t=>`<button class="chip ${activeFilter===t?"selected":""}" onclick="setFilter('${t}')">${t}</button>`).join("")}</div>
  ${list.length?list.map(n=>noteCard(n)).join(""):`<div class="empty"><b>🌱</b>这里还空空的。<br>按右下角的 ＋，种下第一颗蒲公英吧。</div>`}`;
 }
@@ -730,9 +727,7 @@ function me(){
   <div class="fd fd1">${dandSVG(18)}</div><div class="fd fd2">${dandSVG(15)}</div><div class="fd fd3">${dandSVG(14)}</div><div class="fd fd4">${dandSVG(16)}</div>
   <div class="fox" onclick="egg()" style="cursor:pointer" title="点我">${foxImg()}</div>
  </div>
- <div class="card"><h3>我是谁</h3><p class="sub" style="margin-top:2px">发表的内容会带上你的头像</p>
-  <div class="row">${[["me","🍃 一一"],["huye","🦊 晔晔"]].map(x=>`<button class="chip ${identity===x[0]?"selected":""}" onclick="setIdentity('${x[0]}')">${x[1]}</button>`).join("")}</div>
- </div>
+ <div class="card fieldCard"><div class="sub" style="margin-bottom:6px">原野一角</div>${total?`<div class="field">${fieldMarkup(total)}</div>`:`<div class="emptyNote">原野还空着。写下一颗蒲公英，它就会在这里扎根。</div>`}</div>
  <div class="card soft"><h3>🍃 蒲公英之间的风</h3>${windMarkup()}</div>
  <div class="card">
   <div class="task" style="cursor:pointer" onclick="openTrash()"><div style="font-size:19px">🗑️</div><div class="taskText"><b>回收站</b>${state.trash.length?`<span style="color:#B66B25;font-size:11px;margin-left:4px">${state.trash.length} 条</span>`:""}</div><div style="color:var(--muted)">›</div></div>
@@ -888,11 +883,8 @@ function egg(){
  toast("✨ 满天的星星，都送给你");
 }
 
-let modalType="想法",weather="",authorSel="me";
-function selectAuthor(el){authorSel=el.dataset.a;document.querySelectorAll("#authorChips .chip").forEach(x=>x.classList.toggle("selected",x===el))}
+let modalType="想法",weather="";
 function openModal(type){
- authorSel=identity;
- document.querySelectorAll("#authorChips .chip").forEach(x=>x.classList.toggle("selected",x.dataset.a===authorSel));
  if(type){modalType=type;weather="";document.querySelectorAll("#weathers .wchip").forEach(x=>x.classList.remove("selected"));}
  document.querySelectorAll("#chips .chip").forEach(x=>x.classList.toggle("selected",x.dataset.type===modalType));
  document.getElementById("weatherRow").style.display=modalType==="情绪"?"block":"none";
@@ -907,7 +899,7 @@ function saveNote(){
  const text=document.getElementById("newText").value.trim();
  if(!text){toast("先写一点点吧。");return}
  if(modalType==="情绪"&&!weather){toast("先选一个今天的天气吧。");return}
- const n={id:"n"+Date.now()+"-"+Math.floor(Math.random()*1e4),type:modalType,text,date:fmtDate(new Date())+" "+fmtTime(new Date()),ts:Date.now(),author:authorSel,comments:[]};
+ const n={id:"n"+Date.now()+"-"+Math.floor(Math.random()*1e4),type:modalType,text,date:fmtDate(new Date())+" "+fmtTime(new Date()),ts:Date.now(),author:identity,comments:[]};
  if(modalType==="情绪")n.weather=weather||"💭";
  state.notes.unshift(n);
  document.getElementById("newText").value="";closeModal();
