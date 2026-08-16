@@ -292,11 +292,12 @@ h3{font-size:15px;font-weight:700;margin:0 0 6px}
 .confirmBox h3{font-size:16px;margin-bottom:6px}
 .confirmBox p{color:var(--muted);font-size:12.5px;line-height:1.7;margin-bottom:16px}
 
-.poemBox{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:88%;z-index:3;text-align:center;padding:9px 12px;border-radius:16px;background:rgba(255,255,255,.16);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);cursor:pointer;border:1px solid rgba(255,255,255,.28)}
-.poemText{font-family:"LXGW WenKai","STKaiti","KaiTi",serif;font-size:11.5px;line-height:1.75;color:#fff;text-shadow:0 1px 3px rgba(60,70,90,.45);letter-spacing:.5px;min-height:42px}
+.poemBox{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:88%;z-index:3;text-align:center;cursor:pointer}
+.poemBox.center{top:50%;transform:translate(-50%,-50%)}
+.poemText{font-family:"LXGW WenKai","STKaiti","KaiTi",serif;font-size:12px;line-height:1.9;color:#fff;text-shadow:0 1px 4px rgba(60,70,90,.55);letter-spacing:1px;min-height:64px}
 .poemText.in{animation:poemIn .55s ease forwards}
 @keyframes poemIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-.poemPart{position:absolute;pointer-events:none;font-family:"LXGW WenKai","STKaiti","KaiTi",serif;font-size:11.5px;color:#fff;text-shadow:0 1px 3px rgba(60,70,90,.45);animation:poemPart .7s ease-out forwards}
+.poemPart{position:absolute;pointer-events:none;font-family:"LXGW WenKai","STKaiti","KaiTi",serif;font-size:12px;color:#fff;text-shadow:0 1px 3px rgba(60,70,90,.5);animation:poemPart .7s ease-out forwards}
 @keyframes poemPart{0%{opacity:1}100%{opacity:0;transform:translate(var(--px),var(--py)) rotate(var(--pr,10deg)) scale(.3)}}
 </style>
 </head>
@@ -722,7 +723,7 @@ function me(){
  const total=dandelionCount();
  return `${hdr("我的森林",`小狐狸 · 已经收集了 ${total} 颗蒲公英`)}
  <div class="forest ${skyClass()}">
-  <div class="poemBox" id="poemBox" onclick="poemNext()" title="点一下换一句"><div class="poemText in" id="poemText">${POEMS[poemIdx]}</div></div>
+  <div class="poemBox ${poemIdx===1?"":"center"}" id="poemBox" onclick="poemNext()" title="点一下换一句"><div class="poemText in" id="poemText">${poemText(poemIdx)}</div></div>
   <div class="fcloud fc1"></div><div class="fcloud fc2"></div>
   <div class="fhill f1"></div><div class="fhill f2"></div>
   ${puffMarkup()}
@@ -812,20 +813,26 @@ let poemIdx=0,poemTimer=null,poemBusy=false;
 function startPoem(){if(poemTimer||poemBusy)return;poemTimer=setTimeout(()=>{poemTimer=null;switchPoem((poemIdx+1)%POEMS.length)},5200)}
 function stopPoem(){if(poemTimer){clearTimeout(poemTimer);poemTimer=null}}
 function poemNext(){stopPoem();switchPoem((poemIdx+1)%POEMS.length)}
+function poemText(i){return POEMS[i].split("，").join("<br>")}
+function collectCharRects(el,boxRect){
+ const rects=[];const walk=document.createTreeWalker(el,NodeFilter.SHOW_TEXT);let node;
+ while((node=walk.nextNode())){
+  const t=node.textContent||"";
+  for(let k=0;k<t.length;k++){
+   try{const r=document.createRange();r.setStart(node,k);r.setEnd(node,k+1);const rc=r.getBoundingClientRect();if(rc.width>0&&rc.height>0)rects.push({ch:t[k],x:rc.left-boxRect.left,y:rc.top-boxRect.top})}catch(e){}
+  }
+ }
+ return rects;
+}
 function switchPoem(i){
  if(poemBusy)return;
  poemBusy=true;
  const box=document.getElementById("poemBox"),el=document.getElementById("poemText");
  if(!box||!el){poemIdx=i;poemBusy=false;return}
- const text=el.textContent||"";
  const bbox=box.getBoundingClientRect();
- if(text.trim()&&bbox.width){
-  const node=el.firstChild||el;
-  const rects=[];
-  for(let k=0;k<text.length;k++){
-   try{const r=document.createRange();r.setStart(node,k);r.setEnd(node,k+1);const rc=r.getBoundingClientRect();if(rc.width>0&&rc.height>0)rects.push({ch:text[k],x:rc.left-bbox.left,y:rc.top-bbox.top})}catch(e){}
-  }
-  el.textContent="";
+ const rects=collectCharRects(el,bbox);
+ if(rects.length){
+  el.innerHTML="";
   rects.forEach(p=>{
    const sp=document.createElement("span");
    sp.className="poemPart";sp.textContent=p.ch;
@@ -837,9 +844,9 @@ function switchPoem(i){
    box.appendChild(sp);
    setTimeout(()=>sp.remove(),850);
   });
-  setTimeout(()=>{poemIdx=i;el.textContent=POEMS[i];el.classList.remove("in");void el.offsetWidth;el.classList.add("in");poemBusy=false;if(document.getElementById("poemBox"))startPoem();},600);
+  setTimeout(()=>{poemIdx=i;box.classList.toggle("center",i!==1);el.innerHTML=poemText(i);el.classList.remove("in");void el.offsetWidth;el.classList.add("in");poemBusy=false;if(document.getElementById("poemBox"))startPoem();},600);
  }else{
-  poemIdx=i;el.textContent=POEMS[i];el.classList.remove("in");void el.offsetWidth;el.classList.add("in");poemBusy=false;startPoem();
+  poemIdx=i;box.classList.toggle("center",i!==1);el.innerHTML=poemText(i);el.classList.remove("in");void el.offsetWidth;el.classList.add("in");poemBusy=false;startPoem();
  }
 }
 
